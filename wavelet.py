@@ -2,8 +2,11 @@ import pywt
 import numpy as np
 import cv2
 
+import imghdr
+
 
 path = "./image/image.bmp"
+typeImage = path.split(".")
 
 def image_normalization(src_img):
     """
@@ -20,6 +23,7 @@ def merge_images(cA, cH_V_D):
     cV = image_normalization(cV) # OK even if removed
     cD = image_normalization(cD) # OK even if removed
     cA = cA[0:cH.shape[0], 0:cV.shape[1]] # If the original image is not a power of 2, it may be rounded, so the size is matched. Match the smaller one
+
     return np.vstack((np.hstack((cA,cH)), np.hstack((cV, cD)))) # Attach pixels at upper left, upper right, lower left, lower right
 
 def coeffs_visualization(cof):
@@ -32,33 +36,48 @@ def coeffs_visualization(cof):
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
-def coeffs_visual_transform(cof):
+# Convert back to uint8 OpenCV format
+def normalization_image_uint8(image):
+    image = image_normalization(image)
+    image *= 255
+    image = np.uint8(image)
+    return image
+
+# show image
+def coeffs_visual_haar_transform(cof):
     LL, (LH, HL, HH) = cof
-    cv2.imshow ("LL", image_normalization(LL))
-    cv2.imshow ("LH", image_normalization(LH))
-    cv2.imshow ("HL", image_normalization(HL))
-    cv2.imshow ("HH", image_normalization(HH))
+    
+    cv2.imshow ("LL", normalization_image_uint8(LL))
+    cv2.imshow ("LH", normalization_image_uint8(LH))
+    cv2.imshow ("HL", normalization_image_uint8(HL))
+    cv2.imshow ("HH", normalization_image_uint8(HH))
     cv2.waitKey(0)
     cv2.destroyAllWindows()
+
+def write_image(cof, wave_name, level):
+    LL, (LH, HL, HH) = cof
+    print (len(cof))
+
+    cv2.imwrite("./image/LL_" + str(wave_name) + "_" + str(level) + "." + str(typeImage[-1]), normalization_image_uint8(LL))
+    cv2.imwrite("./image/LH_" + str(wave_name) + "_" + str(level) + "." + str(typeImage[-1]), normalization_image_uint8(LH))
+    cv2.imwrite("./image/HL_" + str(wave_name) + "_" + str(level) + "." + str(typeImage[-1]), normalization_image_uint8(HL))
+    cv2.imwrite("./image/HH_" + str(wave_name) + "_" + str(level) + "." + str(typeImage[-1]), normalization_image_uint8(HH))
 
 def wavelet_transform_for_image(src_image, level, M_WAVELET="db1", mode="sym"):
     data = src_image.astype(np.float64)
     coeffs = pywt.wavedec2(data, M_WAVELET, level=level, mode=mode)
     return coeffs
 
-def wavelet_image(write = False, show = False):
+def wavelet_image(level, write = False, show = False):
     filename = "./image/image_resize.bmp"
-    LEVEL = 1
+    LEVEL = level
 
     # 'haar', 'db', 'sym' etc...
     # URL: http://pywavelets.readthedocs.io/en/latest/ref/wavelets.html
     MOTHER_WAVELET = "haar"
 
     im = cv2.imread(filename)
-
-    # print('LEVEL :', LEVEL)
-    # print('MOTHER_WAVELET', MOTHER_WAVELET)
-    # print('original image size: ', im.shape)
+    gray = cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)
 
     """
     Conversion for each BGR channel
@@ -77,7 +96,11 @@ def wavelet_image(write = False, show = False):
     # coeffs_visualization(coeffs_R)
 
     if(show == True):
-        coeffs_visual_transform(coeffs_B)
+        # coeffs_visual_haar_transform(coeffs_B)
+        coeffs_visualization(coeffs_B)
+    if(write == True):
+        write_image(coeffs_B, MOTHER_WAVELET, LEVEL)
+
 
 # resize image
 def resize_img():

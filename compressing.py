@@ -27,23 +27,34 @@ def rgb_to_gray(value = False):
     
     if (value == True):
         return gray
-    
+
+def image_normalization(src_img):
+    """
+    Normalization processing to prevent overexposure
+    Necessary when displaying wavelet converted images with cv2.imshow (only for images with large values)
+    """
+    norm_img = (src_img - np.min(src_img)) / (np.max(src_img) - np.min(src_img))
+    return norm_img
+
 # haar wavelet
 def haar_wave():
     image = rgb_to_gray(True)
-    cv2.imshow("Image", image)
 
     # Convert to float for more resolution for use with pywt
-    image = np.float32(image)
+    image = np.float64(image)
     image /= 255
     
     coeffs = pywt.dwt2(image, 'haar', 'smooth')
     LL, (LH, HL, HH) = coeffs
 
     # Convert back to uint8 OpenCV format
+    LL = image_normalization(LL)
     LL *= 255
     LL = np.uint8(LL)
 
     cv2.imshow("LL Image", LL)
+    cv2.imwrite("./image/test.bmp", LL)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
+
+haar_wave()

@@ -17,6 +17,5 @@ from use_aes import UseAES
 # rgb to grayscale image
 # Compress.rgb_to_gray()
 
-# haar wavelet
-Compress.wavelet_image()
-
+# haar wavelet (level, write, show)
+Compress.wavelet_image(2, True, True)
