@@ -26,12 +26,14 @@ def merge_images(cA, cH_V_D):
 
     return np.vstack((np.hstack((cA,cH)), np.hstack((cV, cD)))) # Attach pixels at upper left, upper right, lower left, lower right
 
+# show image in single window
 def coeffs_visualization(cof):
     norm_cof0 = cof[0]
     norm_cof0 = image_normalization(norm_cof0) # OK even if removed
     merge = norm_cof0
     for i in range(1, len(cof)):
         merge = merge_images(merge, cof[i])  # Combine four images
+
     cv2.imshow('', merge)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
@@ -43,11 +45,11 @@ def normalization_image_uint8(image):
     image = np.uint8(image)
     return image
 
-# show image
+# show image with many window
 def coeffs_visual_haar_transform(cof):
-    LL, (LH, HL, HH) = cof
-    
-    cv2.imshow ("LL", normalization_image_uint8(LL))
+    LH, HL, HH = cof[1]
+
+    cv2.imshow ("LL", normalization_image_uint8(cof[0]))
     cv2.imshow ("LH", normalization_image_uint8(LH))
     cv2.imshow ("HL", normalization_image_uint8(HL))
     cv2.imshow ("HH", normalization_image_uint8(HH))
@@ -55,10 +57,9 @@ def coeffs_visual_haar_transform(cof):
     cv2.destroyAllWindows()
 
 def write_image(cof, wave_name, level):
-    LL, (LH, HL, HH) = cof
-    print (len(cof))
+    LH, HL, HH = cof[1]
 
-    cv2.imwrite("./image/LL_" + str(wave_name) + "_" + str(level) + "." + str(typeImage[-1]), normalization_image_uint8(LL))
+    cv2.imwrite("./image/LL_" + str(wave_name) + "_" + str(level) + "." + str(typeImage[-1]), normalization_image_uint8(cof[0]))
     cv2.imwrite("./image/LH_" + str(wave_name) + "_" + str(level) + "." + str(typeImage[-1]), normalization_image_uint8(LH))
     cv2.imwrite("./image/HL_" + str(wave_name) + "_" + str(level) + "." + str(typeImage[-1]), normalization_image_uint8(HL))
     cv2.imwrite("./image/HH_" + str(wave_name) + "_" + str(level) + "." + str(typeImage[-1]), normalization_image_uint8(HH))
@@ -100,6 +101,30 @@ def wavelet_image(level, write = False, show = False):
         coeffs_visualization(coeffs_B)
     if(write == True):
         write_image(coeffs_B, MOTHER_WAVELET, LEVEL)
+
+
+    # testing
+    # 1
+    # LL, (LH, HL, HH) = coeffs_B
+    # print(im)
+    # print(coeffs_B[0])
+    # print(normalization_image_uint8(coeffs_B[0]))
+
+    # im = cv2.imread("./image/LL_haar_1.bmp")
+    # print(cv2.cvtColor(im, cv2.COLOR_BGR2GRAY))
+
+    # print(np.array_equal(normalization_image_uint8(coeffs_B[0]),cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)))
+
+    # 2
+    # LL, (LH, HL, HH) = coeffs_B
+    # cof = LL, (LH, HL, HH)
+    # cofRec = pywt.waverec2(cof, "haar")
+    # A = cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)
+    # B = cofRec.astype(np.int64)
+
+    # print(A)
+    # print(B)
+    # print(np.array_equal(A,B))
 
 
 # resize image

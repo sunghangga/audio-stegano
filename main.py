@@ -18,4 +18,4 @@ from use_aes import UseAES
 # Compress.rgb_to_gray()
 
 # haar wavelet (level, write, show)
-Compress.wavelet_image(2, True, True)
+Compress.wavelet_image(1, False, False)
