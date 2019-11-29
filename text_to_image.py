@@ -1,15 +1,5 @@
 import cv2
 
-# file = open("./image/image_resize.bmp", "rb+")
-# fileList = file.readlines()
-
-# file.write(b"\n")
-# file.write(bytes([3]))
-# print (fileList[-1])
-# print (int.from_bytes(fileList[-1], byteorder='big'))
-
-# file.close()
-
 
 def to_bit_generator(msg):
     """Converts a message into a generator which returns 1 bit of the message
@@ -43,37 +33,34 @@ def encrypt(key):
 			j = 0
 		
 	# Write out the image with hidden message
-	cv2.imwrite("test.bmp", img)
+	cv2.imwrite("./image/text_to_img.bmp", img)
 
 	# write length binary string in image
-	file = open("test.bmp", "rb+")
+	file = open("./image/text_to_img.bmp", "rb+")
 	fileList = file.readlines()
 	
 	file.write(b"\n")
 	file.write(str.encode(byte_iter))
-	file.write(b"\n")
-	byte = len(bytes(to_bit_generator(path_chiper))).to_bytes(2, 'big')
-	file.write(byte)
 
 	file.close()
 
 def decrypt(key):
 	# Read the image and try to restore the message
-	img = cv2.imread("test.bmp", cv2.IMREAD_GRAYSCALE)
+	img = cv2.imread("./image/img_from_wav.bmp", cv2.IMREAD_GRAYSCALE)
 	i = 0
 	bits = ''
 	chars = []
 	key_gen = to_bit_generator(key)
 	key_list = list(key_gen)
 
-	# read length text
-	file = open("test.bmp", "rb+")
+	# read image state
+	file = open("./image/img_from_wav.bmp", "rb+")
+
 	fileList = file.readlines()
-	len_text = int.from_bytes(fileList[-1], byteorder='big')
-	state = fileList[-2]
+	state = fileList[-1]
 	state = list(str(state, 'utf-8'))
-	# delete last array ("\n")
-	del state[-1]
+	len_text = len(state)
+
 	file.close()
 
 	m = len(state)-2
@@ -96,7 +83,9 @@ def decrypt(key):
 			bits = ''
 	# reserve array
 	chars.reverse()
-	print(''.join(chars))
 
-# encrypt("asuuu")
-decrypt("asuuu")
+	# create as txt file output
+	# print(''.join(chars))
+	file = open("./text/enc_from_img.txt","w+")
+	file.write(str(''.join(chars)))
+	file.close()

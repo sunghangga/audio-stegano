@@ -29,10 +29,6 @@ class UseAES:
 
     def to_decryption(self, ciphertext):
         decrypted = self.AES.decrypt(ciphertext)
-        # convert from int to hex
-        # varDecrypted = format(decrypted, "x")
-        # convert hex to string
-        # varDecrypted = bytes.fromhex(varDecrypted).decode("utf-8")
         file = open("./text/decryption.txt","w+")
         file.write(str(decrypted))
         file.close()

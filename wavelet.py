@@ -2,8 +2,6 @@ import pywt
 import numpy as np
 import cv2
 
-import imghdr
-
 
 path = "./image/image.bmp"
 typeImage = path.split(".")
