@@ -2,18 +2,18 @@ import wave
 import cv2
 import numpy as np
 
-def encrypt(key):
+def encrypt(key, pathOriginalMusic, pathImageEmbbed, pathEmbbedWav):
     # read wave audio file
-    song = wave.open("./music/Sympy.wav", mode='rb')
+    song = wave.open(pathOriginalMusic, mode='rb')
     # Read frames and convert to byte array
     frame_bytes = bytearray(list(song.readframes(song.getnframes())))
 
     # open image
-    path_image = "./image/text_to_img.bmp"
+    path_image = pathImageEmbbed
     typeImage = path_image.split(".")
     
     # read length text and state
-    file = open("./image/text_to_img.bmp", "rb+")
+    file = open(pathImageEmbbed, "rb+")
     fileList = file.readlines() 
     state = fileList[-1]
     file.close()
@@ -45,12 +45,12 @@ def encrypt(key):
     frame_modified = bytes(frame_bytes)
 
     # Write bytes to a new wave audio file
-    with wave.open("./music/song_embedded.wav", 'wb') as fd:
+    with wave.open(pathEmbbedWav, 'wb') as fd:
         fd.setparams(song.getparams())
         fd.writeframes(frame_modified)
         
     # write length binary string in image
-    file = open("./music/song_embedded.wav", "rb+")
+    file = open(pathEmbbedWav, "rb+")
     fileList = file.readlines()
     
     file.write(b"\n")
@@ -61,13 +61,13 @@ def encrypt(key):
 
     song.close()
 
-def decrypt(key):
-    song = wave.open("./music/song_embedded.wav", mode='rb')
+def decrypt(key, pathEmbbedWav, pathDestinationImage, pathExtractWav):
+    song = wave.open(pathEmbbedWav, mode='rb')
     # Convert audio to byte array
     frame_bytes = bytearray(list(song.readframes(song.getnframes())))
 
     # read music state
-    file = open("./music/song_embedded.wav", "rb+")
+    file = open(pathEmbbedWav, "rb+")
 
     fileList = file.readlines()
     state = fileList[-1]
@@ -110,13 +110,20 @@ def decrypt(key):
     wav_arr = np.packbits(wav_arr, axis=-1)
 
     img_decode = cv2.imdecode(wav_arr, cv2.IMREAD_GRAYSCALE)
-    cv2.imwrite("./image/img_from_wav.bmp", img_decode)
+    cv2.imwrite(pathDestinationImage, img_decode)
 
     # write length binary string in image
-    file = open("./image/img_from_wav.bmp", "rb+")
+    file = open(pathDestinationImage, "rb+")
     fileList = file.readlines()
-    
     file.write(b"\n")
     file.write(str.encode(''.join(state_img)))
+    file.close()
 
+    # delete last line wav
+    file = open(pathEmbbedWav, "rb+")
+    fileList = file.readlines()
+    lines = fileList[:-2]
+    file.close()
+    file = open(pathExtractWav, "wb+")
+    file.writelines([item for item in lines])
     file.close()

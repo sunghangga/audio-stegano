@@ -1,31 +1,23 @@
-import numpy
+import math
+import numpy as np
 from skimage import io
 import tensorflow as tf
 
 
-# compare string
-def compare_str():
-    file = open("./text/plaintext.txt","r+")
-    plaintext = file.read()
-    file.close()
+def mse(var1, var2):
+    var1 = np.array(var1, dtype=np.float64)
+    var2 = np.array(var2, dtype=np.float64)
+    mse = np.mean((var1 - var2)**2)
 
-    file = open("./text/decryption.txt","r+")
-    decrypt_text = file.read()
-    file.close()
-    return plaintext == decrypt_text
+    return mse
 
-# compare img
-def log10(x):
-    numerator = tf.log(x)
-    denominator = tf.log(tf.constant(10, dtype=numerator.dtype))
-    return numerator / denominator
+def psnr(var1, var2):
+    var1 = np.array(var1, dtype=np.float64)
+    var2 = np.array(var2, dtype=np.float64)
 
-def psnr(im1, im2):
-    img_arr1 = numpy.array(im1).astype('float32')
-    img_arr2 = numpy.array(im2).astype('float32')
-    mse = tf.reduce_mean(tf.squared_difference(img_arr1, img_arr2))
-    psnr = tf.constant(255**2, dtype=tf.float32)/mse
-    result = tf.constant(10, dtype=tf.float32)*log10(psnr)
-    with tf.Session():
-        result = result.eval()
-    return result
+    mse = np.mean((var1 - var2)**2)
+    if mse == 0:
+        return float('inf')
+        
+    psnr = 20 * math.log10(255.0 / math.sqrt(mse))
+    return psnr

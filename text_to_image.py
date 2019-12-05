@@ -9,9 +9,9 @@ def to_bit_generator(msg):
     	for i in range(8):
         	yield (o & (1 << i)) >> i
 
-def encrypt(key):
-	path_image = "./image/LL_haar_1.bmp"
-	path_chiper = open("./text/encryption.txt", "r").read()
+def encrypt(key, pathOriginalImage, pathChiperText, pathDestinationImage):
+	path_image = pathOriginalImage
+	path_chiper = open(pathChiperText, "r").read()
 
     # Create a generator for the hidden message and key
 	hidden_message = to_bit_generator(path_chiper)
@@ -33,10 +33,10 @@ def encrypt(key):
 			j = 0
 		
 	# Write out the image with hidden message
-	cv2.imwrite("./image/text_to_img.bmp", img)
+	cv2.imwrite(pathDestinationImage, img)
 
 	# write length binary string in image
-	file = open("./image/text_to_img.bmp", "rb+")
+	file = open(pathDestinationImage, "rb+")
 	fileList = file.readlines()
 	
 	file.write(b"\n")
@@ -44,9 +44,9 @@ def encrypt(key):
 
 	file.close()
 
-def decrypt(key):
+def decrypt(key, pathEmbbedImage, pathDestinationText, pathExtractImage):
 	# Read the image and try to restore the message
-	img = cv2.imread("./image/img_from_wav.bmp", cv2.IMREAD_GRAYSCALE)
+	img = cv2.imread(pathEmbbedImage, cv2.IMREAD_GRAYSCALE)
 	i = 0
 	bits = ''
 	chars = []
@@ -54,7 +54,7 @@ def decrypt(key):
 	key_list = list(key_gen)
 
 	# read image state
-	file = open("./image/img_from_wav.bmp", "rb+")
+	file = open(pathEmbbedImage, "rb+")
 
 	fileList = file.readlines()
 	state = fileList[-1]
@@ -85,7 +85,15 @@ def decrypt(key):
 	chars.reverse()
 
 	# create as txt file output
-	# print(''.join(chars))
-	file = open("./text/enc_from_img.txt","w+")
+	file = open(pathDestinationText,"w+")
 	file.write(str(''.join(chars)))
+	file.close()
+
+	# delete last line of file
+	file = open(pathEmbbedImage, "rb+")
+	fileList = file.readlines()
+	lines = fileList[:-1]
+	file.close()
+	file = open(pathExtractImage, "wb+")
+	file.writelines([item for item in lines])
 	file.close()
