@@ -92,8 +92,11 @@ def decrypt(key, pathEmbbedImage, pathDestinationText, pathExtractImage):
 	# delete last line of file
 	file = open(pathEmbbedImage, "rb+")
 	fileList = file.readlines()
-	lines = fileList[:-1]
+	lastLine = fileList[-2]
+	lines = fileList[:-2]
+	lines.append(lastLine[:-1])
 	file.close()
+
 	file = open(pathExtractImage, "wb+")
 	file.writelines([item for item in lines])
 	file.close()

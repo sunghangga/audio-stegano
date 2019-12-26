@@ -122,8 +122,11 @@ def decrypt(key, pathEmbbedWav, pathDestinationImage, pathExtractWav):
     # delete last line wav
     file = open(pathEmbbedWav, "rb+")
     fileList = file.readlines()
-    lines = fileList[:-2]
+    lastLine = fileList[-3]
+    lines = fileList[:-3]
+    lines.append(lastLine[:-1])
     file.close()
+
     file = open(pathExtractWav, "wb+")
     file.writelines([item for item in lines])
     file.close()
