@@ -54,20 +54,20 @@ def coeffs_visual_haar_transform(cof):
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
-def write_image(cof, wave_name, level):
+def write_image(cof, wave_name, level, path_output):
     LH, HL, HH = cof[1]
 
-    cv2.imwrite("./image/LL_" + str(wave_name) + "_" + str(level) + "." + str(typeImage[-1]), normalization_image_uint8(cof[0]))
-    # cv2.imwrite("./image/LH_" + str(wave_name) + "_" + str(level) + "." + str(typeImage[-1]), normalization_image_uint8(LH))
-    # cv2.imwrite("./image/HL_" + str(wave_name) + "_" + str(level) + "." + str(typeImage[-1]), normalization_image_uint8(HL))
-    # cv2.imwrite("./image/HH_" + str(wave_name) + "_" + str(level) + "." + str(typeImage[-1]), normalization_image_uint8(HH))
+    cv2.imwrite(path_output, normalization_image_uint8(cof[0]))
+    # cv2.imwrite(path_output, normalization_image_uint8(LH))
+    # cv2.imwrite(path_output, normalization_image_uint8(HL))
+    # cv2.imwrite(path_output, normalization_image_uint8(HH))
 
 def wavelet_transform_for_image(src_image, level, M_WAVELET="db1", mode="sym"):
     data = src_image.astype(np.float64)
     coeffs = pywt.wavedec2(data, M_WAVELET, level=level, mode=mode)
     return coeffs
 
-def wavelet_image(level, pathOriginalImage, write = False, show = False):
+def wavelet_image(level, pathOriginalImage, pathOutput, write = False, show = False):
     filename = pathOriginalImage
     LEVEL = level
 
@@ -98,7 +98,7 @@ def wavelet_image(level, pathOriginalImage, write = False, show = False):
         # coeffs_visual_haar_transform(coeffs_B)
         coeffs_visualization(coeffs_B)
     if(write == True):
-        write_image(coeffs_B, MOTHER_WAVELET, LEVEL)
+        write_image(coeffs_B, MOTHER_WAVELET, LEVEL, pathOutput)
 
 
     # testing

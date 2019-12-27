@@ -1,7 +1,6 @@
 import time
 import os
 import wave
-from scipy.io import wavfile as wav
 import cv2
 import testing as Test
 import wavelet as Compress
@@ -21,8 +20,9 @@ msg = "ilkom udayana"
 '''resize image'''
 # Compress.resize_img()
 
-'''haar wavelet (level, path of original image, write, show)'''
-# Compress.wavelet_image(3, "./image/image.bmp", True, False)
+'''haar wavelet (level, path of original image, path output image, write, show)'''
+# level = 3
+# Compress.wavelet_image(level, "./image/image.bmp", "./image/LL_haar_"+level+".bmp", True, False)
 
 '''LSB text to image (key, pathOriginalImage, pathChiperText, pathDestinationImage)'''
 # Tti.encrypt(key, "./image/LL_haar_1.bmp", "./text/encryption.txt", "./image/text_to_img.bmp")
